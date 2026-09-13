@@ -24,7 +24,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 .me .who{padding:5px 10px;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
 .me .who b{font-weight:600}
 .me button{border:1px solid var(--line);background:transparent;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:0.78rem}
-.tt{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.tt{display:inline-flex;flex:0 0 auto;border:1px solid var(--line);border-radius:8px}
+.tt button:first-child{border-radius:7px 0 0 7px}.tt button:last-child{border-radius:0 7px 7px 0}
 .tt button{border:none;border-radius:0;padding:5px 10px;font-size:0.76rem;background:transparent;cursor:pointer;color:var(--muted)}
 .tt button+button{border-left:1px solid var(--line)}
 .tt button.on{background:var(--accent);color:var(--accent-ink)}
@@ -36,7 +37,9 @@ button,input,select,textarea{font:inherit;color:inherit}
   .top .in{gap:8px;padding:8px 12px}
   .brand{font-size:0.98rem}.brand small{display:none}
   .ver{white-space:normal;font-size:0.72rem;flex:1 1 100%}
-  .me{margin-left:0;width:100%;justify-content:space-between;gap:6px}
+  .me{margin-left:0;width:100%;justify-content:space-between;gap:6px;flex-wrap:wrap}
+  .me .who{flex:1 1 120px}
+  .me #exportBtn{flex:1 1 auto}
   .me .who{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .me button,.tt button,.fbtn,.q .open,.tools .add{min-height:42px}
   .tt button{padding:5px 12px}
@@ -44,7 +47,7 @@ button,input,select,textarea{font:inherit;color:inherit}
   .wrap{padding:12px 12px 60px;gap:12px}
   .rail{flex-direction:column;gap:6px}
   .rail h3{display:none}
-  .themes{flex-direction:row;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:6px;padding:2px 0 8px;scrollbar-width:thin}
+  .themes{flex-direction:row;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:6px;padding:2px 0 8px;scrollbar-width:thin;width:100%}
   .theme{flex:0 0 auto;width:auto;white-space:nowrap;padding:9px 12px;border-color:var(--line);background:var(--card)}
   .tools{padding:10px}
   .tools input[type=search]{flex:1 1 100%}
@@ -60,7 +63,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 .note{background:var(--warm-soft);border:1px solid var(--line);border-left:4px solid var(--warm);border-radius:10px;padding:12px 14px;font-size:0.86rem;color:var(--ink)}
 .note.blue{background:var(--soft);border-left-color:var(--accent)}
 .wrap{max-width:1240px;margin:0 auto;padding:16px 18px 60px;display:grid;grid-template-columns:250px 1fr;gap:18px;align-items:start}
-@media (max-width:900px){.wrap{grid-template-columns:1fr}.rail{position:static}}
+@media (max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.rail{position:static}}
+.rail,.main,.themes,.progwrap{min-width:0;max-width:100%}
 .rail{position:sticky;top:76px;display:flex;flex-direction:column;gap:6px}
 .rail h3{font-family:var(--disp);font-size:0.72rem;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);margin:8px 0 4px;font-weight:700}
 .theme{display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid transparent;border-radius:10px;cursor:pointer;background:transparent;text-align:left;width:100%}
