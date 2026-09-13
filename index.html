@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hirsch Clarification Register</title>
+<script>(function(){try{var t=localStorage.getItem("hq-theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}})();</script>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
 :root{--paper:#f7f8fb;--card:#ffffff;--ink:#14213d;--muted:#4b5563;--line:#e2e6ef;--accent:#3253DC;--accent-ink:#ffffff;--warm:#b45309;--ok:#15803d;--alert:#b91c1c;--soft:#eef2ff;--warm-soft:#fff7ed;--ok-soft:#f0fdf4;--alert-soft:#fef2f2;--mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;--sans:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;--disp:'Montserrat','Segoe UI',system-ui,sans-serif}
@@ -23,7 +24,39 @@ button,input,select,textarea{font:inherit;color:inherit}
 .me .who{padding:5px 10px;border:1px solid var(--line);border-radius:8px;background:var(--paper)}
 .me .who b{font-weight:600}
 .me button{border:1px solid var(--line);background:transparent;border-radius:8px;padding:5px 10px;cursor:pointer;font-size:0.78rem}
+.tt{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.tt button{border:none;border-radius:0;padding:5px 10px;font-size:0.76rem;background:transparent;cursor:pointer;color:var(--muted)}
+.tt button+button{border-left:1px solid var(--line)}
+.tt button.on{background:var(--accent);color:var(--accent-ink)}
+.themes{display:flex;flex-direction:column;gap:6px}
 .banner{max-width:1240px;margin:12px auto 0;padding:0 18px}
+@media (max-width:640px){
+  body{font-size:16px}
+  input,select,textarea,button{font-size:16px}
+  .top .in{gap:8px;padding:8px 12px}
+  .brand{font-size:0.98rem}.brand small{display:none}
+  .ver{white-space:normal;font-size:0.72rem;flex:1 1 100%}
+  .me{margin-left:0;width:100%;justify-content:space-between;gap:6px}
+  .me .who{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .me button,.tt button,.fbtn,.q .open,.tools .add{min-height:42px}
+  .tt button{padding:5px 12px}
+  .banner{padding:0 12px}
+  .wrap{padding:12px 12px 60px;gap:12px}
+  .rail{flex-direction:column;gap:6px}
+  .rail h3{display:none}
+  .themes{flex-direction:row;overflow-x:auto;-webkit-overflow-scrolling:touch;gap:6px;padding:2px 0 8px;scrollbar-width:thin}
+  .theme{flex:0 0 auto;width:auto;white-space:nowrap;padding:9px 12px;border-color:var(--line);background:var(--card)}
+  .tools{padding:10px}
+  .tools input[type=search]{flex:1 1 100%}
+  .tools select{flex:1 1 45%;min-width:0}
+  .tools .add{flex:1 1 100%}
+  .tools .cnt{flex:1 1 100%;margin-left:0;text-align:right}
+  .q{padding:12px 12px;border-radius:12px}
+  .q .hd{gap:8px}.q .id{min-width:30px}.q .ask{font-size:0.98rem}
+  .q .open{align-self:flex-start;padding:8px 12px}
+  .box{padding:16px;max-height:92vh;overflow:auto}
+  .fig{padding:6px}
+}
 .note{background:var(--warm-soft);border:1px solid var(--line);border-left:4px solid var(--warm);border-radius:10px;padding:12px 14px;font-size:0.86rem;color:var(--ink)}
 .note.blue{background:var(--soft);border-left-color:var(--accent)}
 .wrap{max-width:1240px;margin:0 auto;padding:16px 18px 60px;display:grid;grid-template-columns:250px 1fr;gap:18px;align-items:start}
@@ -102,7 +135,7 @@ select.status{padding:8px 10px;border:1px solid var(--line);border-radius:9px;ba
 <div class="top"><div class="in">
 <div class="brand">Hirsch Clarification Register<small>Hirsch Dynamics &times; TechNext &middot; answer, follow up, comment &mdash; every change is dated and versioned</small></div>
 <div class="ver" id="ver">register <b>v&mdash;</b> &middot; loading&hellip;</div>
-<div class="me"><span class="who" id="who">Not signed in</span><button id="whoBtn" type="button">Change</button><button id="exportBtn" type="button" title="Copy the whole register as Markdown">Copy as Markdown</button></div>
+<div class="me"><span class="who" id="who">Not signed in</span><button id="whoBtn" type="button">Change</button><button id="exportBtn" type="button" title="Copy the whole register as Markdown">Copy as Markdown</button><div class="tt" role="group" aria-label="Colour theme"><button type="button" data-theme-set="auto" title="Follow device setting">Auto</button><button type="button" data-theme-set="light">Light</button><button type="button" data-theme-set="dark">Dark</button></div></div>
 </div></div>
 
 <div class="banner"><div class="note blue" id="dbnote">Connecting to the shared register&hellip; answers you save here are visible to everyone with the link.</div></div>
@@ -235,6 +268,9 @@ function askWho(){$('#nameIn').value=me?me.name:'';$('#roleIn').value=me?me.role
 $('#whoBtn').onclick=askWho;
 $('#whoSave').onclick=function(){var n=$('#nameIn').value.trim();if(!n){$('#nameIn').focus();return}me={name:n,role:$('#roleIn').value};try{localStorage.setItem('hq-me',JSON.stringify(me))}catch(e){}renderWho();$('#whoModal').classList.remove('on');render()};
 renderWho(); if(!me) askWho();
+/* ---- colour theme: auto / light / dark ---- */
+function applyTheme(mode){var h=document.documentElement;if(mode==='light'||mode==='dark')h.setAttribute('data-theme',mode);else h.removeAttribute('data-theme');try{if(mode==='auto')localStorage.removeItem('hq-theme');else localStorage.setItem('hq-theme',mode)}catch(e){}Array.prototype.forEach.call(document.querySelectorAll('[data-theme-set]'),function(b){b.classList.toggle('on',b.getAttribute('data-theme-set')===mode);b.setAttribute('aria-pressed',b.getAttribute('data-theme-set')===mode?'true':'false')})}
+(function(){var saved=null;try{saved=localStorage.getItem('hq-theme')}catch(e){}applyTheme(saved==='light'||saved==='dark'?saved:'auto');Array.prototype.forEach.call(document.querySelectorAll('[data-theme-set]'),function(b){b.addEventListener('click',function(){applyTheme(b.getAttribute('data-theme-set'))})})})();
 
 /* ---- data helpers ---- */
 function allQuestions(){var custom=Object.keys(state).filter(function(k){return state[k]&&state[k].custom}).map(function(k){var c=state[k].custom;return {id:k,group:c.group,priority:c.priority,owners:[c.owner],ask:esc(c.ask),why:esc(c.why),evidence:'Added by '+esc(c.by)+' on '+fmt(c.at),custom:true}});return window.QUESTIONS.concat(custom)}
@@ -277,11 +313,7 @@ function renderVer(){var v=$('#ver');v.innerHTML='register <b>v'+(meta.rev||0)+'
 
 /* ---- rendering ---- */
 function counts(){var qs=allQuestions(),byG={},tot=0,done=0;qs.forEach(function(q){var g=byG[q.group]=byG[q.group]||{n:0,d:0};g.n++;tot++;var s=statusOf(q.id);if(s==='answered'||s==='confirmed'||s==='na'){g.d++;done++}});return {byG:byG,tot:tot,done:done}}
-function renderRail(){var c=counts(),h='';h+='<h3>Progress</h3><div class="bar"><i style="width:'+(c.tot?Math.round(100*c.done/c.tot):0)+'%"></i></div><div class="prog">'+c.done+' of '+c.tot+' answered</div>';
- h+='<button class="theme'+(filterGroup===''?' on':'')+'" data-g=""><span class="n">All questions</span><span class="c">'+c.tot+'</span></button>';
- h+='<h3>Themes</h3>';
- window.GROUPS.forEach(function(g){var x=c.byG[g.id]||{n:0,d:0};h+='<button class="theme'+(filterGroup===g.id?' on':'')+'" data-g="'+g.id+'"><span class="n">'+g.title+'</span><span class="c">'+x.d+'/'+x.n+'</span></button>'});
- $('#rail').innerHTML=h;
+function renderRail(){var c=counts(),h='';h+='<div class="progwrap"><h3>Progress</h3><div class="bar"><i style="width:'+(c.tot?Math.round(100*c.done/c.tot):0)+'%"></i></div><div class="prog">'+c.done+' of '+c.tot+' answered</div></div>';h+='<h3>Themes</h3><div class="themes">';h+='<button class="theme'+(filterGroup===''?' on':'')+'" data-g=""><span class="n">All questions</span><span class="c">'+c.tot+'</span></button>';window.GROUPS.forEach(function(g){var x=c.byG[g.id]||{n:0,d:0};h+='<button class="theme'+(filterGroup===g.id?' on':'')+'" data-g="'+g.id+'"><span class="n">'+g.title+'</span><span class="c">'+x.d+'/'+x.n+'</span></button>'});h+='</div>';$('#rail').innerHTML=h;
  Array.prototype.forEach.call(document.querySelectorAll('.theme'),function(b){b.onclick=function(){filterGroup=b.getAttribute('data-g');render();window.scrollTo({top:0,behavior:'smooth'})}});
 }
 function passes(q){var s=st(q.id),term=$('#search').value.trim().toLowerCase(),fs=$('#fStatus').value,fp=$('#fPrio').value,fo=$('#fOwner').value;
