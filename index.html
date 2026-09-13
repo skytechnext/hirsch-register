@@ -41,7 +41,7 @@ button,input,select,textarea{font:inherit;color:inherit}
   .me .who{flex:1 1 120px}
   .me #exportBtn{flex:1 1 auto}
   .me .who{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .me button,.tt button,.fbtn,.q .open,.tools .add{min-height:42px}
+  .me button,.tt button,.fbtn,.q .openbtn,.tools .add,.btn{min-height:42px}
   .tt button{padding:5px 12px}
   .banner{padding:0 12px}
   .wrap{padding:12px 12px 60px;gap:12px}
@@ -56,7 +56,7 @@ button,input,select,textarea{font:inherit;color:inherit}
   .tools .cnt{flex:1 1 100%;margin-left:0;text-align:right}
   .q{padding:12px 12px;border-radius:12px}
   .q .hd{gap:8px}.q .id{min-width:30px}.q .ask{font-size:0.98rem}
-  .q .open{align-self:flex-start;padding:8px 12px}
+  .q .openbtn{align-self:flex-start;padding:8px 12px}
   .box{padding:16px;max-height:92vh;overflow:auto}
   .fig{padding:6px}
 }
@@ -86,8 +86,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 .q .hd{display:flex;gap:10px;align-items:flex-start}
 .q .id{font-family:var(--disp);font-weight:800;font-size:0.78rem;color:var(--accent);min-width:38px;padding-top:3px}
 .q .ask{flex:1;font-weight:600;font-size:0.97rem;line-height:1.45;text-wrap:balance}
-.q .open{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:0.78rem;white-space:nowrap}
-.q .open:hover{border-color:var(--accent);color:var(--accent)}
+.q .openbtn{border:1px solid var(--line);background:var(--paper);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:0.78rem;white-space:nowrap}
+.q .openbtn:hover{border-color:var(--accent);color:var(--accent)}
 .meta{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 0 48px;align-items:center}
 .chip{font-size:0.66rem;font-weight:600;letter-spacing:0.4px;text-transform:uppercase;padding:2px 8px;border-radius:100px;border:1px solid var(--line);color:var(--muted);background:var(--paper)}
 .chip.p1{background:var(--alert-soft);color:var(--alert);border-color:transparent}.chip.p2{background:var(--warm-soft);color:var(--warm);border-color:transparent}
@@ -100,7 +100,9 @@ button,input,select,textarea{font:inherit;color:inherit}
 .ev b{color:var(--ink);font-weight:600}
 .ev code,.why code,.ask code{font-family:var(--mono);font-size:0.86em;background:var(--soft);padding:0 4px;border-radius:4px}
 .ans-prev{margin:8px 0 0 48px;padding:10px 12px;background:var(--ok-soft);border-radius:8px;font-size:0.88rem;line-height:1.55;white-space:pre-wrap}
-.panel{margin:12px 0 0 48px;border-top:1px dashed var(--line);padding-top:12px;display:grid;gap:12px}
+.panel{margin:12px 0 0 48px;border-top:1px dashed var(--line);padding-top:12px;display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.panel>div{min-width:0}
+.q{min-width:0;max-width:100%}
 @media (max-width:640px){.q .why,.ev,.ans-prev,.panel,.meta{margin-left:0}}
 .panel h4{margin:0 0 6px;font-family:var(--disp);font-size:0.72rem;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);font-weight:700}
 textarea{width:100%;min-height:84px;padding:10px 12px;border:1px solid var(--line);border-radius:9px;background:var(--paper);resize:vertical;line-height:1.5}
@@ -119,7 +121,7 @@ select.status{padding:8px 10px;border:1px solid var(--line);border-radius:9px;ba
 .item .reply textarea{min-height:48px}
 .hist{font-family:var(--mono);font-size:0.72rem;color:var(--muted);display:grid;gap:3px;max-height:220px;overflow:auto;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:var(--paper)}
 .hist b{color:var(--ink);font-weight:500}
-.fig{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;overflow-x:auto}
+.fig{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;overflow-x:auto;max-width:100%;-webkit-overflow-scrolling:touch}
 .fig svg{display:block;min-width:700px;width:100%;height:auto}
 .empty{padding:30px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
 .modal{position:fixed;inset:0;background:rgba(10,14,25,0.55);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
@@ -325,7 +327,7 @@ function passes(q){var s=st(q.id),term=$('#search').value.trim().toLowerCase(),f
  if(term){var hay=(q.id+' '+q.ask+' '+q.why+' '+(q.evidence||'')+' '+(s.answer||'')+' '+JSON.stringify(s.comments||[])+' '+JSON.stringify(s.followups||[])).toLowerCase();if(hay.indexOf(term)<0)return false}
  return true}
 function card(q){var s=st(q.id),status=statusOf(q.id),g=window.GROUPS.filter(function(x){return x.id===q.group})[0];
- var h='<article class="q st-'+status+'" id="q-'+q.id+'"><div class="hd"><span class="id">'+esc(label(q))+'</span><div class="ask">'+q.ask+'</div><button class="open" data-id="'+q.id+'" type="button">'+(openId===q.id?'Close':'Open')+'</button></div>';
+ var h='<article class="q st-'+status+'" id="q-'+q.id+'"><div class="hd"><span class="id">'+esc(label(q))+'</span><div class="ask">'+q.ask+'</div><button class="openbtn" data-id="'+q.id+'" type="button">'+(openId===q.id?'Close':'Open')+'</button></div>';
  h+='<div class="meta"><span class="chip '+q.priority+'">'+PRIO[q.priority]+'</span>';q.owners.forEach(function(o){h+='<span class="chip">'+esc(OWN[o]||o)+'</span>'});
  h+='<span class="chip st '+status+'">'+STATUS[status]+'</span>'+(g?'<span class="chip">'+(g.short||g.title)+'</span>':'');
  if(s.answeredAt)h+='<span class="byline">answered by '+esc(s.answeredBy||'')+' &middot; '+esc(fmt(s.answeredAt))+' &middot; rev '+(s.rev||1)+'</span>';
