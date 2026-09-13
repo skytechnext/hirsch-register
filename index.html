@@ -344,19 +344,29 @@ function panel(q,s){var h='<div class="panel">';
  h+='</div><div class="row" style="margin-top:8px"><textarea id="cm-'+q.id+'" placeholder="Add a comment&hellip;" style="min-height:52px;flex:1"></textarea><button class="btn ghost small" data-comment="'+q.id+'" type="button"'+(db?'':' disabled')+'>Comment</button></div></div>';
  h+='<div><h4>Version history</h4><div class="hist">'+((s.history||[]).length?(s.history||[]).slice().reverse().map(function(x){return '<div><b>rev '+x.rev+'</b> &middot; '+esc(fmt(x.at))+' &middot; '+esc(x.by)+' &middot; '+esc(x.change)+'</div>'}).join(''):'<div>No changes yet.</div>')+'</div></div>';
  h+='</div>';return h}
-function render(){renderRail();var qs=allQuestions().filter(passes),h='';
+function bind(root){
+ Array.prototype.forEach.call(root.querySelectorAll('[data-id]'),function(b){b.onclick=function(){var id=b.getAttribute('data-id'),prev=openId;openId=(openId===id?null:id);if(prev&&prev!==id)rerenderCard(prev);rerenderCard(id)}});
+ Array.prototype.forEach.call(root.querySelectorAll('[data-save]'),function(b){b.onclick=function(){var id=b.getAttribute('data-save'),a=$('#ans-'+id).value.trim(),stv=$('#stat-'+id).value;if(!me){askWho();return}
+   writeDoc(id,function(c){var prev=c.answer||'';c.answer=a;c.status=stv;if(a&&a!==prev){c.answeredBy=who();c.answeredAt=nowIso()}},'answer saved · status '+STATUS[stv])}});
+ Array.prototype.forEach.call(root.querySelectorAll('[data-followup]'),function(b){b.onclick=function(){var id=b.getAttribute('data-followup'),box=$('#fq-'+id),t=box.value.trim();if(!t)return;if(!me){askWho();return}box.value='';
+   writeDoc(id,function(c){c.followups.push({id:'f'+Date.now(),text:t,by:who(),at:nowIso()});if(c.status!=='answered'&&c.status!=='confirmed')c.status='followup'},'follow-up added')}});
+ Array.prototype.forEach.call(root.querySelectorAll('[data-fanswer]'),function(b){b.onclick=function(){var p=b.getAttribute('data-fanswer').split('|'),id=p[0],i=+p[1],box=$('#fa-'+id+'-'+i),t=box.value.trim();if(!t)return;if(!me){askWho();return}box.value='';
+   writeDoc(id,function(c){if(c.followups[i]){c.followups[i].answer=t;c.followups[i].answeredBy=who();c.followups[i].answeredAt=nowIso()}},'follow-up '+(i+1)+' answered')}});
+ Array.prototype.forEach.call(root.querySelectorAll('[data-comment]'),function(b){b.onclick=function(){var id=b.getAttribute('data-comment'),box=$('#cm-'+id),t=box.value.trim();if(!t)return;if(!me){askWho();return}box.value='';
+   writeDoc(id,function(c){c.comments.push({id:'c'+Date.now(),text:t,by:who(),at:nowIso()})},'comment added')}});
+}
+/* Swap one card in place — no list rebuild, no scrolling — so Open/Close never moves the page. */
+function rerenderCard(id){var q=allQuestions().filter(function(x){return x.id===id})[0],el=document.getElementById('q-'+id);if(!q||!el)return;var tmp=document.createElement('div');tmp.innerHTML=card(q);var nu=tmp.firstElementChild;el.replaceWith(nu);bind(nu)}
+function render(){
+ var y=window.scrollY,keep={};
+ if(openId)Array.prototype.forEach.call(document.querySelectorAll('#q-'+openId+' textarea'),function(el){if(el.id)keep[el.id]=el.value});
+ renderRail();var qs=allQuestions().filter(passes),h='';
  if(!qs.length)h='<div class="empty">No questions match.</div>';
  else{var lastG=null;qs.forEach(function(q){if(!filterGroup&&q.group!==lastG){var g=window.GROUPS.filter(function(x){return x.id===q.group})[0];h+='<h3 style="font-family:var(--disp);font-size:0.78rem;letter-spacing:1.1px;text-transform:uppercase;color:var(--muted);margin:14px 0 2px">'+(g?g.title:q.group)+'</h3>';lastG=q.group}h+=card(q)})}
  $('#list').innerHTML=h;$('#cnt').textContent=qs.length+' of '+allQuestions().length;
- Array.prototype.forEach.call(document.querySelectorAll('[data-id]'),function(b){b.onclick=function(){var id=b.getAttribute('data-id');openId=(openId===id?null:id);render();if(openId){var el=document.getElementById('q-'+openId);if(el)el.scrollIntoView({block:'start',behavior:'smooth'})}}});
- Array.prototype.forEach.call(document.querySelectorAll('[data-save]'),function(b){b.onclick=function(){var id=b.getAttribute('data-save'),a=$('#ans-'+id).value.trim(),stv=$('#stat-'+id).value;if(!me){askWho();return}
-   writeDoc(id,function(c){var prev=c.answer||'';c.answer=a;c.status=stv;if(a&&a!==prev){c.answeredBy=who();c.answeredAt=nowIso()}},'answer saved · status '+STATUS[stv])}});
- Array.prototype.forEach.call(document.querySelectorAll('[data-followup]'),function(b){b.onclick=function(){var id=b.getAttribute('data-followup'),t=$('#fq-'+id).value.trim();if(!t)return;if(!me){askWho();return}
-   writeDoc(id,function(c){c.followups.push({id:'f'+Date.now(),text:t,by:who(),at:nowIso()});if(c.status!=='answered'&&c.status!=='confirmed')c.status='followup'},'follow-up added')}});
- Array.prototype.forEach.call(document.querySelectorAll('[data-fanswer]'),function(b){b.onclick=function(){var p=b.getAttribute('data-fanswer').split('|'),id=p[0],i=+p[1],t=$('#fa-'+id+'-'+i).value.trim();if(!t)return;if(!me){askWho();return}
-   writeDoc(id,function(c){if(c.followups[i]){c.followups[i].answer=t;c.followups[i].answeredBy=who();c.followups[i].answeredAt=nowIso()}},'follow-up '+(i+1)+' answered')}});
- Array.prototype.forEach.call(document.querySelectorAll('[data-comment]'),function(b){b.onclick=function(){var id=b.getAttribute('data-comment'),t=$('#cm-'+id).value.trim();if(!t)return;if(!me){askWho();return}
-   writeDoc(id,function(c){c.comments.push({id:'c'+Date.now(),text:t,by:who(),at:nowIso()})},'comment added')}});
+ bind($('#list'));
+ Object.keys(keep).forEach(function(k){var el=document.getElementById(k);if(el&&keep[k])el.value=keep[k]});
+ window.scrollTo(0,y);
 }
 ['search','fStatus','fPrio','fOwner'].forEach(function(id){$('#'+id).addEventListener('input',render);$('#'+id).addEventListener('change',render)});
 
